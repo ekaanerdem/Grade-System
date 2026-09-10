@@ -24,6 +24,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 // YA DA DİREK TOPLU ŞU ŞEKLDE YAZABİLİRSİN;
 //import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Student", description = "Öğrenci işlemleri")
+
 @RestController
 public class StudentController{
 
@@ -33,26 +38,31 @@ public class StudentController{
         this.studentService = studentService;
     }
 
+@Operation(summary = "Tüm öğrencileri listeler")
 @GetMapping("/students")
     public List<Student> getAllStudents(){
         return studentService.getAllStudents();
 }
 
+@Operation(summary = "Yeni öğrenci oluşturur")
 @PostMapping("/students")
     public Student saveStudent(@RequestBody Student student){
         return studentService.saveStudent(student);
 }
 
+@Operation(summary = "ID'ye göre öğrenci getirir")
 @GetMapping("/students/{id}")
     public Student getStudentById(@PathVariable Long id){
         return studentService.getStudentById(id);
     }
 
+@Operation(summary = "Öğrenci bilgilerini günceller")
 @PutMapping("/students/{id}")
 public Student updateStudent(@PathVariable Long id, @RequestBody Student student){
     return studentService.updateStudent(id, student);
 }
 
+@Operation(summary = "Öğrenciyi siler")
 @DeleteMapping("/students/{id}")
     public void deleteStudent(@PathVariable Long id){
         studentService.deleteStudent(id);
