@@ -40,13 +40,20 @@ UserDetailsService userDetailsService (PasswordEncoder passwordEncoder){
 }
 
 @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-    http
-        .csrf(csrf -> csrf.disable()) //Swagger'dan POST/PUT/DELETE test ederken CSRF yüzünden engellenmememizi sağlıyor.
-            .authorizeHttpRequests(auth -> auth.anyRequest().authenticated()) //API'ye erişmek isteyen herkes 
-                .formLogin(form -> form.permitAll());                        // önce giriş yapmalı.
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-                return http.build();                    
+    http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/h2-console/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .headers(headers -> headers
+                    .frameOptions(frame -> frame.sameOrigin())
+            )
+            .formLogin(form -> form.permitAll());
+
+    return http.build();
 }
 
 
