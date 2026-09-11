@@ -9,6 +9,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @Tag(name = "Grade", description = "Not işlemleri")
 @RestController
 public class GradeController{
@@ -19,30 +21,35 @@ public class GradeController{
         this.gradeService = gradeService;
     }
     @Operation(summary = "Tüm notları listeler")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/grades")
     public List<Grade> getAllGrades(){
         return gradeService.getAllGrades();
      }
 
     @Operation(summary = "Yeni not oluşturur")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/grades")
     public Grade saveGrade(@RequestBody Grade grade){
         return gradeService.saveGrade(grade);
      }
 
     @Operation(summary = "ID'ye göre not getirir")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/grades/{id}")
     public Grade getGradeById(@PathVariable Long id){
         return gradeService.getGradeById(id);
     }
 
     @Operation(summary = "Not bilgisini günceller")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/grades/{id}")
     public Grade updateGrade(@PathVariable Long id, @RequestBody Grade grade){
         return gradeService.updateGrade(id, grade);
     }
 
     @Operation(summary = "Notu siler")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/grades/{id}")
     public void deleteGrade(@PathVariable Long id){
         gradeService.deleteGrade(id);
