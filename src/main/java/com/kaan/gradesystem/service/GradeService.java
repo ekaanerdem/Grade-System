@@ -17,7 +17,9 @@ public class GradeService{
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
 
-    public GradeService(GradeRepository gradeRepository, StudentRepository studentRepository, CourseRepository courseRepository){
+    public GradeService(GradeRepository gradeRepository, 
+                        StudentRepository studentRepository, 
+                        CourseRepository courseRepository){
         this.gradeRepository = gradeRepository;
         this.studentRepository = studentRepository;
         this.courseRepository = courseRepository;
@@ -27,10 +29,15 @@ public class GradeService{
         return gradeRepository.findAll();
     }
 
-    public Grade saveGrade(Grade grade){
+    public Grade saveGrade(Grade grade) {
 
-        Student student = studentRepository.findById(grade.getStudent().getId()).orElse(null);
-        Course course = courseRepository.findById(grade.getCourse().getId()).orElse(null);
+        Student student = studentRepository
+                .findById(grade.getStudent().getId())
+                .orElseThrow(() -> new RuntimeException("Student bulunamadı"));
+
+        Course course = courseRepository
+                .findById(grade.getCourse().getId())
+                .orElseThrow(() -> new RuntimeException("Course bulunamadı"));
 
         grade.setStudent(student);
         grade.setCourse(course);
@@ -39,30 +46,28 @@ public class GradeService{
     }
 
     public Grade getGradeById(Long id){
-        return gradeRepository.findById(id).orElse(null);
+        return gradeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grade bulunamadı"));
     }
 
-    public Grade updateGrade(Long id, Grade grade){
-        Grade existingGrade = gradeRepository.findById(id).orElse(null);
+    public Grade updateGrade(Long id, Grade grade) {
 
-        if(existingGrade == null){
-            return null;
-        }
+        Grade existingGrade = gradeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Grade bulunamadı"));
 
         Student student = studentRepository
                 .findById(grade.getStudent().getId())
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("Student bulunamadı"));
 
         Course course = courseRepository
                 .findById(grade.getCourse().getId())
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("Course bulunamadı"));
 
         existingGrade.setScore(grade.getScore());
         existingGrade.setStudent(student);
         existingGrade.setCourse(course);
 
         return gradeRepository.save(existingGrade);
-
     }
 
     public void deleteGrade(Long id){
