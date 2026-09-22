@@ -1,6 +1,7 @@
 package com.kaan.gradesystem.controller;
 
-import com.kaan.gradesystem.entity.Grade;
+import com.kaan.gradesystem.dto.GradeRequest;
+import com.kaan.gradesystem.dto.GradeResponse;
 import com.kaan.gradesystem.service.GradeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,32 +21,36 @@ public class GradeController{
     public GradeController(GradeService gradeService){
         this.gradeService = gradeService;
     }
+
     @Operation(summary = "Tüm notları listeler")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/grades")
-    public List<Grade> getAllGrades(){
+    public List<GradeResponse> getAllGrades(){
         return gradeService.getAllGrades();
-     }
+    }
 
     @Operation(summary = "Yeni not oluşturur")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/grades")
-    public Grade saveGrade(@RequestBody Grade grade){
-        return gradeService.saveGrade(grade);
-     }
+    public GradeResponse saveGrade(@RequestBody GradeRequest request){
+        return gradeService.saveGrade(request);
+    }
 
     @Operation(summary = "ID'ye göre not getirir")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/grades/{id}")
-    public Grade getGradeById(@PathVariable Long id){
+    public GradeResponse getGradeById(@PathVariable Long id){
         return gradeService.getGradeById(id);
     }
 
     @Operation(summary = "Not bilgisini günceller")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/grades/{id}")
-    public Grade updateGrade(@PathVariable Long id, @RequestBody Grade grade){
-        return gradeService.updateGrade(id, grade);
+    public GradeResponse updateGrade(
+            @PathVariable Long id,
+            @RequestBody GradeRequest request){
+
+        return gradeService.updateGrade(id, request);
     }
 
     @Operation(summary = "Notu siler")
@@ -54,6 +59,4 @@ public class GradeController{
     public void deleteGrade(@PathVariable Long id){
         gradeService.deleteGrade(id);
     }
-
-
 }

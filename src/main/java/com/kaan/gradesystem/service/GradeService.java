@@ -1,5 +1,7 @@
 package com.kaan.gradesystem.service;
 
+import com.kaan.gradesystem.dto.GradeRequest;
+import com.kaan.gradesystem.dto.GradeResponse;
 import com.kaan.gradesystem.entity.Course;
 import com.kaan.gradesystem.entity.Grade;
 import com.kaan.gradesystem.entity.Student;
@@ -8,6 +10,7 @@ import com.kaan.gradesystem.repository.GradeRepository;
 import com.kaan.gradesystem.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,53 +28,99 @@ public class GradeService{
         this.courseRepository = courseRepository;
     }
 
-    public List<Grade> getAllGrades(){
-        return gradeRepository.findAll();
+    public List<GradeResponse> getAllGrades(){
+
+        List<Grade> grades = gradeRepository.findAll();
+        List<GradeResponse> responses = new ArrayList<>();
+
+        for (Grade grade : grades){
+
+            GradeResponse response = new GradeResponse();
+
+            response.setId(grade.getId());
+            response.setScore(grade.getScore());
+            response.setStudentId(grade.getStudent().getId());
+            response.setCourseId(grade.getCourse().getId());
+
+            responses.add(response);
+        }
+
+        return responses;
     }
 
-    public Grade saveGrade(Grade grade) {
+    public GradeResponse saveGrade(GradeRequest request) {
 
         Student student = studentRepository
-                .findById(grade.getStudent().getId())
+                .findById(request.getStudentId())
                 .orElseThrow(() -> new RuntimeException("Student bulunamadı"));
 
         Course course = courseRepository
-                .findById(grade.getCourse().getId())
+                .findById(request.getCourseId())
                 .orElseThrow(() -> new RuntimeException("Course bulunamadı"));
 
+        Grade grade = new Grade();
+
+        grade.setScore(request.getScore());
         grade.setStudent(student);
         grade.setCourse(course);
 
-        return gradeRepository.save(grade);
+        Grade savedGrade = gradeRepository.save(grade);
+
+        GradeResponse response = new GradeResponse();
+
+        response.setId(savedGrade.getId());
+        response.setScore(savedGrade.getScore());
+        response.setStudentId(savedGrade.getStudent().getId());
+        response.setCourseId(savedGrade.getCourse().getId());
+
+        return response;
     }
 
-    public Grade getGradeById(Long id){
-        return gradeRepository.findById(id)
+    public GradeResponse getGradeById(Long id){
+
+        Grade grade = gradeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grade bulunamadı"));
+
+        GradeResponse response = new GradeResponse();
+
+        response.setId(grade.getId());
+        response.setScore(grade.getScore());
+        response.setStudentId(grade.getStudent().getId());
+        response.setCourseId(grade.getCourse().getId());
+
+        return response;
     }
 
-    public Grade updateGrade(Long id, Grade grade) {
+    public GradeResponse updateGrade(Long id, GradeRequest request) {
 
         Grade existingGrade = gradeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grade bulunamadı"));
 
         Student student = studentRepository
-                .findById(grade.getStudent().getId())
+                .findById(request.getStudentId())
                 .orElseThrow(() -> new RuntimeException("Student bulunamadı"));
 
         Course course = courseRepository
-                .findById(grade.getCourse().getId())
+                .findById(request.getCourseId())
                 .orElseThrow(() -> new RuntimeException("Course bulunamadı"));
 
-        existingGrade.setScore(grade.getScore());
+        existingGrade.setScore(request.getScore());
         existingGrade.setStudent(student);
         existingGrade.setCourse(course);
 
-        return gradeRepository.save(existingGrade);
+        Grade updatedGrade = gradeRepository.save(existingGrade);
+
+        GradeResponse response = new GradeResponse();
+
+        response.setId(updatedGrade.getId());
+        response.setScore(updatedGrade.getScore());
+        response.setStudentId(updatedGrade.getStudent().getId());
+        response.setCourseId(updatedGrade.getCourse().getId());
+
+        return response;
     }
 
     public void deleteGrade(Long id){
         gradeRepository.deleteById(id);
     }
-
 }

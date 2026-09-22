@@ -5,6 +5,8 @@ package com.kaan.gradesystem.service;
 
 import com.kaan.gradesystem.entity.Student;
 import com.kaan.gradesystem.repository.StudentRepository;
+import com.kaan.gradesystem.dto.StudentRequest;
+import com.kaan.gradesystem.dto.StudentResponse;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,17 +25,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class) //JUnit'a “Bu testte Mockito kullanacağım” diyoruz
-
 class StudentServiceTest {
 
     //Gerçek repository yerine sahte StudentRepository oluşturuyor.
-
     @Mock
     private StudentRepository studentRepository; 
 
     //Gerçek StudentService oluşturuyor ve yukarıdaki sahte studentRepository'yi bunun içine veriyor.
     //@InjectMocks = “Mock olarak oluşturduğum bağımlılıkları StudentService'in içine inject et.”
-
     @InjectMocks 
     private StudentService studentService;
 
@@ -49,13 +48,16 @@ class StudentServiceTest {
         List<Student> students = List.of(student1, student2);
 
         //“Birazdan studentRepository.findAll() çağrılırsa gerçek veritabanına gitme. Bana students listesini döndür.” ;
-
+        // Repository'nin sahte cevabı
         when(studentRepository.findAll()).thenReturn(students);
 
-        List<Student> result = studentService.getAllStudents(); 
+        // Service artık Student değil StudentResponse döndürüyor.
+        List<StudentResponse> result = studentService.getAllStudents(); 
 
         assertEquals(2, result.size()); //Çıkan sonuç beklediğimiz gibi mi?
-
+        assertEquals("Ertu", result.get(0).getName());
+        assertEquals("Kaan", result.get(1).getName());
+        
         verify(studentRepository).findAll(); //“StudentService gerçekten studentRepository.findAll() metodunu çağırdı mı?”
 
     }
@@ -63,18 +65,29 @@ class StudentServiceTest {
     @Test
     void saveStudent_ShouldReturnSavedStudent(){
 
+        StudentRequest request = new StudentRequest();
+        request.setName("Ali");
+
         Student student = new Student();
         student.setName("Ali");
 
-        when(studentRepository.save(student)).thenReturn(student);
+        when(studentRepository.save(
+                org.mockito.ArgumentMatchers.argThat(s ->
+                        s.getName().equals("Ali")
+                )
+        )).thenReturn(student);
 
-        Student result = studentService.saveStudent(student);
+        StudentResponse result = studentService.saveStudent(request);
 
         assertEquals("Ali", result.getName());
 
         //assertEquals sonucu kontrol ediyor, verify ise Service ile Repository arasındaki etkileşimi kontrol ediyor.
 
-        verify(studentRepository).save(student);
+        verify(studentRepository).save(
+                org.mockito.ArgumentMatchers.argThat(s ->
+                        s.getName().equals("Ali")
+                )
+        );
     }
 
     @Test
@@ -88,7 +101,7 @@ class StudentServiceTest {
         //Optional, bir değerin mevcut olabileceğini veya hiç bulunmayabileceğini güvenli şekilde temsil eden yapıdır
         //Optional.of(student) : “findById(1L) sonucunda bir öğrenci bulundu ve bulunan öğrenci bu.”
 
-        Student result = studentService.getStudentById(1L);
+        StudentResponse result = studentService.getStudentById(1L);
 
         assertEquals("Kaan", result.getName());
 
@@ -102,7 +115,7 @@ class StudentServiceTest {
 
         when(studentRepository.findById(id)).thenReturn(Optional.empty());
 
-        Student result = studentService.getStudentById(id);
+        StudentResponse result = studentService.getStudentById(id);
 
         assertNull(result);
 
@@ -118,7 +131,7 @@ class StudentServiceTest {
         existingStudent.setName("Ertuğrul Kaan");
         existingStudent.setEmail("eski@example.com");
 
-        Student newStudent = new Student();
+        StudentRequest newStudent = new StudentRequest();
         newStudent.setName("Kaan");
         newStudent.setEmail("yeni@example.com");
 
@@ -128,7 +141,7 @@ class StudentServiceTest {
         when(studentRepository.save(existingStudent))
                 .thenReturn(existingStudent);
 
-        Student result = studentService.updateStudent(id, newStudent);
+        StudentResponse result = studentService.updateStudent(id, newStudent);
 
         assertEquals("Kaan", result.getName());
         assertEquals("yeni@example.com", result.getEmail());
@@ -147,13 +160,4 @@ class StudentServiceTest {
 
         verify(studentRepository).deleteById(id);
     }
-
-
-
-
-
-
-
-
-
 }

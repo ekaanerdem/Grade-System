@@ -23,66 +23,70 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity //@PreAuthorize gibi method güvenliklerini aktif et demek.
 public class SecurityConfig {
 
-
         @Bean //Spring'in oluşturup yönettiği Java nesnesi.
         public PasswordEncoder passwordEncoder(){ //şifreyi düz metin olarak Spring Security'ye vermek yerine BCrypt ile işliyor.
-        return new BCryptPasswordEncoder(); //“Bu metodun döndürdüğü nesneyi sen oluştur, sakla ve 
-        }                                  //uygulamanın ihtiyaç duyduğu yerlerde kullan.”
+                return new BCryptPasswordEncoder();  
+        }//“Bu metodun döndürdüğü nesneyi sen oluştur, sakla veuygulamanın ihtiyaç duyduğu yerlerde kullan.”
 
         @Bean 
         UserDetailsService userDetailsService (PasswordEncoder passwordEncoder){
-        UserDetails admin = User.builder()
-        .username("admin")
-        .password(passwordEncoder.encode("1234"))
-        .roles("ADMIN")
-        .build();
+                UserDetails admin = User.builder()
+                        .username("admin")
+                        .password(passwordEncoder.encode("1234"))
+                        .roles("ADMIN")
+                        .build();
 
-        UserDetails user = User.builder()
-        .username("user")
-        .password(passwordEncoder.encode("5678"))
-        .roles("USER")
-        .build();
+                UserDetails user = User.builder()
+                        .username("user")
+                        .password(passwordEncoder.encode("5678"))
+                        .roles("USER")
+                        .build();
 
-        return new InMemoryUserDetailsManager(admin ,user); //kullanıcıları şimdilik veritabanında değil,
-                                                                //uygulamanın belleğinde tutuyor.
+                return new InMemoryUserDetailsManager(admin ,user);
+                //kullanıcıları şimdilik veritabanında değil, uygulamanın belleğinde tutuyor.
         }
 
         @Bean
         public SecurityFilterChain securityFilterChain(
-                HttpSecurity http,
-                JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-
+                HttpSecurity http, 
+                JwtAuthenticationFilter jwtAuthenticationFilter
+        ) throws Exception {
                 http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())
-                )
-                .addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        .csrf(csrf -> csrf.disable())
 
-        return http.build();
+                        .authorizeHttpRequests(auth -> auth
+                                .requestMatchers("/auth/login").permitAll()
+                                .requestMatchers("/h2-console/**").permitAll()
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**"
+                                ).permitAll()
+                                .anyRequest().authenticated()
+                        )
+
+                        .sessionManagement(session -> session
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        )
+
+                        .headers(headers -> headers
+                                .frameOptions(frame -> frame.sameOrigin())
+                        )
+
+                        .addFilterBefore(
+                                jwtAuthenticationFilter,
+                                UsernamePasswordAuthenticationFilter.class
+                        );
+
+                return http.build();
         }
 
         @Bean
         public AuthenticationManager authenticationManager(
-                AuthenticationConfiguration configuration) throws Exception{
-                        return configuration.getAuthenticationManager();
-                }
-
-
+                AuthenticationConfiguration configuration
+        ) throws Exception {
+                return configuration.getAuthenticationManager();
         }
+
+
+}

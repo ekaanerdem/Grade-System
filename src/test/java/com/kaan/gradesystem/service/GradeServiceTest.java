@@ -1,5 +1,7 @@
 package com.kaan.gradesystem.service;
 
+import com.kaan.gradesystem.dto.GradeRequest;
+import com.kaan.gradesystem.dto.GradeResponse;
 import com.kaan.gradesystem.entity.Course;
 import com.kaan.gradesystem.entity.Grade;
 import com.kaan.gradesystem.entity.Student;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class GradeServiceTest{
@@ -42,65 +45,87 @@ class GradeServiceTest{
     @Test
     void getAllGrades_ShouldReturnGrades() {
 
+        Student student = new Student();
+        student.setId(1L);
+
+        Course course = new Course();
+        course.setId(2L);
+
         Grade grade1 = new Grade();
         grade1.setScore(80.0);
+        grade1.setStudent(student);
+        grade1.setCourse(course);
 
         Grade grade2 = new Grade();
         grade2.setScore(95.0);
+        grade2.setStudent(student);
+        grade2.setCourse(course);
 
         List<Grade> grades = List.of(grade1, grade2);
 
         when(gradeRepository.findAll()).thenReturn(grades);
 
-        List<Grade> result = gradeService.getAllGrades();
+        List<GradeResponse> result = gradeService.getAllGrades();
 
-        assertEquals(grades, result);
-
-        /* ya da :
         assertEquals(2, result.size());
         assertEquals(80.0, result.get(0).getScore());
-        assertEquals(95.0, result.get(1).getScore()); */
+        assertEquals(95.0, result.get(1).getScore());
 
         verify(gradeRepository).findAll(); 
     }
 
     @Test
-    void saveGrade_ShouldReturnSavedGrade() {
+void saveGrade_ShouldReturnSavedGrade() {
 
-        Long studentId = 1L;
-        Long courseId = 2L;
+    Long studentId = 1L;
+    Long courseId = 2L;
 
-        Student student = new Student();
-        student.setId(studentId);
+    Student student = new Student();
+    student.setId(studentId);
 
-        Course course = new Course();
-        course.setId(courseId);
+    Course course = new Course();
+    course.setId(courseId);
 
-        Grade grade = new Grade();
-        grade.setScore(90.0);
-        grade.setStudent(student);
-        grade.setCourse(course);
+    GradeRequest grade = new GradeRequest();
+    grade.setScore(90.0);
+    grade.setStudentId(studentId);
+    grade.setCourseId(courseId);
 
-        when(studentRepository.findById(studentId))
-                .thenReturn(Optional.of(student));
+    Grade savedGrade = new Grade();
+    savedGrade.setScore(90.0);
+    savedGrade.setStudent(student);
+    savedGrade.setCourse(course);
 
-        when(courseRepository.findById(courseId))
-                .thenReturn(Optional.of(course));
+    when(studentRepository.findById(studentId))
+            .thenReturn(Optional.of(student));
 
-        when(gradeRepository.save(grade))
-                .thenReturn(grade);
+    when(courseRepository.findById(courseId))
+            .thenReturn(Optional.of(course));
 
-        Grade result = gradeService.saveGrade(grade);
+    /*
+    DTO kullanmadan önce:
+    when(gradeRepository.save(grade))
+            .thenReturn(grade);
 
-        assertEquals(grade, result);
-        assertEquals(student, result.getStudent());
-        assertEquals(course, result.getCourse());
-        assertEquals(90.0, result.getScore());
+    diyebiliyorduk.
 
-        verify(studentRepository).findById(studentId);
-        verify(courseRepository).findById(courseId);
-        verify(gradeRepository).save(grade);
-    }
+    Ama artık Service, GradeRequest'ten kendi Grade nesnesini oluşturduğu için
+    testteki Grade ile Service'in oluşturduğu Grade aynı nesne değil.
+    Bu yüzden herhangi bir Grade geldiğinde anlamında any(Grade.class) kullanıyoruz.
+    */
+    when(gradeRepository.save(any(Grade.class)))
+            .thenReturn(savedGrade);
+
+    GradeResponse result = gradeService.saveGrade(grade);
+
+    assertEquals(studentId, result.getStudentId());
+    assertEquals(courseId, result.getCourseId());
+    assertEquals(90.0, result.getScore());
+
+    verify(studentRepository).findById(studentId);
+    verify(courseRepository).findById(courseId);
+    verify(gradeRepository).save(any(Grade.class));
+}
 
     @Test 
     void saveGrade_ShouldThrowException_WhenStudentNotFound() {
@@ -108,16 +133,10 @@ class GradeServiceTest{
         Long studentId = 99L;
         Long courseId = 2L;
 
-        Student student = new Student();
-        student.setId(studentId);
-
-        Course course = new Course();
-        course.setId(courseId);
-
-        Grade grade = new Grade();
+        GradeRequest grade = new GradeRequest();
         grade.setScore(90.0);
-        grade.setStudent(student);
-        grade.setCourse(course);
+        grade.setStudentId(studentId);
+        grade.setCourseId(courseId);
 
         when(studentRepository.findById(studentId))
                 .thenReturn(Optional.empty());
@@ -141,13 +160,10 @@ class GradeServiceTest{
         Student student = new Student();
         student.setId(studentId);
 
-        Course course = new Course();
-        course.setId(courseId);
-
-        Grade grade = new Grade();
+        GradeRequest grade = new GradeRequest();
         grade.setScore(90.0);
-        grade.setStudent(student);
-        grade.setCourse(course);
+        grade.setStudentId(studentId);
+        grade.setCourseId(courseId);
 
         when(studentRepository.findById(studentId))
                 .thenReturn(Optional.of(student));
@@ -171,15 +187,25 @@ class GradeServiceTest{
 
         Long id = 1L;
 
+        Student student = new Student();
+        student.setId(2L);
+
+        Course course = new Course();
+        course.setId(3L);
+
         Grade grade = new Grade();
         grade.setScore(85.0);
+        grade.setStudent(student);
+        grade.setCourse(course);
 
         when(gradeRepository.findById(id))
                 .thenReturn(Optional.of(grade));
 
-        Grade result = gradeService.getGradeById(id);
+        GradeResponse result = gradeService.getGradeById(id);
 
-        assertEquals(grade, result);
+        assertEquals(85.0, result.getScore());
+        assertEquals(2L, result.getStudentId());
+        assertEquals(3L, result.getCourseId());
 
         verify(gradeRepository).findById(id);
     }
@@ -218,10 +244,10 @@ class GradeServiceTest{
         Course course = new Course();
         course.setId(courseId);
 
-        Grade newGrade = new Grade();
+        GradeRequest newGrade = new GradeRequest();
         newGrade.setScore(95.0);
-        newGrade.setStudent(student);
-        newGrade.setCourse(course);
+        newGrade.setStudentId(studentId);
+        newGrade.setCourseId(courseId);
 
         when(gradeRepository.findById(gradeId))
                 .thenReturn(Optional.of(existingGrade));
@@ -235,11 +261,11 @@ class GradeServiceTest{
         when(gradeRepository.save(existingGrade))
                 .thenReturn(existingGrade);
 
-        Grade result = gradeService.updateGrade(gradeId, newGrade);
+        GradeResponse result = gradeService.updateGrade(gradeId, newGrade);
 
         assertEquals(95.0, result.getScore());
-        assertEquals(student, result.getStudent());
-        assertEquals(course, result.getCourse());
+        assertEquals(studentId, result.getStudentId());
+        assertEquals(courseId, result.getCourseId());
 
         verify(gradeRepository).findById(gradeId);
         verify(studentRepository).findById(studentId);
@@ -262,7 +288,7 @@ class GradeServiceTest{
 
         Long gradeId = 99L;
 
-        Grade newGrade = new Grade();
+        GradeRequest newGrade = new GradeRequest();
 
         when(gradeRepository.findById(gradeId))
                 .thenReturn(Optional.empty());
@@ -286,16 +312,10 @@ class GradeServiceTest{
 
         Grade existingGrade = new Grade();
 
-        Student student = new Student();
-        student.setId(studentId);
-
-        Course course = new Course();
-        course.setId(courseId);
-
-        Grade newGrade = new Grade();
+        GradeRequest newGrade = new GradeRequest();
         newGrade.setScore(90.0);
-        newGrade.setStudent(student);
-        newGrade.setCourse(course);
+        newGrade.setStudentId(studentId);
+        newGrade.setCourseId(courseId);
 
         when(gradeRepository.findById(gradeId))
                 .thenReturn(Optional.of(existingGrade));
@@ -329,13 +349,10 @@ class GradeServiceTest{
         Student student = new Student();
         student.setId(studentId);
 
-        Course course = new Course();
-        course.setId(courseId);
-
-        Grade newGrade = new Grade();
+        GradeRequest newGrade = new GradeRequest();
         newGrade.setScore(90.0);
-        newGrade.setStudent(student);
-        newGrade.setCourse(course);
+        newGrade.setStudentId(studentId);
+        newGrade.setCourseId(courseId);
 
         when(gradeRepository.findById(gradeId))
                 .thenReturn(Optional.of(existingGrade));
@@ -359,13 +376,4 @@ class GradeServiceTest{
 
         verify(gradeRepository, never()).save(existingGrade);
     }*/
-
-
-
-
-
-
-
-
-
 }
