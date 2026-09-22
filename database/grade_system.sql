@@ -145,6 +145,39 @@ alter table grade
 add constraint chk_grade_score
 check (score BETWEEN 0 AND 100);
 
+-- ORDER BY: NOTLARI YÜKSEKTEN DÜŞÜĞE SIRALAMA
+select
+    id,
+    score
+from grade
+order by score desc;
+
+-- ORDER BY: NOTLARI DÜŞÜKTEN YÜKSEĞE SIRALAMA
+select
+    id,
+    score
+from grade
+order by score asc;
+
+-- LIMIT: EN YÜKSEK 3 NOTU GETİRME
+select
+    id,
+    score
+from grade
+order by score desc
+limit 3;
+
+-- COUNT: TOPLAM ÖĞRENCİ SAYISINI BULMA
+select count(*) AS "Student Count"
+from student;
+
+-- MIN VE MAX: EN DÜŞÜK VE EN YÜKSEK NOTU BULMA
+select
+    min(score) AS "Minimum Score",
+    max(score) AS "Maximum Score",
+    avg(score) as "Average Score"
+FROM grade;
+
 
 
 
