@@ -9,6 +9,8 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+// @Valid = “GradeRequest geldiğinde üzerindeki @NotNull, @DecimalMin, @DecimalMax kurallarını kontrol et.”
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -31,8 +33,8 @@ public class GradeController{
 
     @Operation(summary = "Yeni not oluşturur")
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/grades")
-    public GradeResponse saveGrade(@RequestBody GradeRequest request){
+    @PostMapping("/grades")         //
+    public GradeResponse saveGrade(@Valid @RequestBody GradeRequest request){
         return gradeService.saveGrade(request);
     }
 
@@ -62,7 +64,7 @@ public class GradeController{
     @PutMapping("/grades/{id}")
     public GradeResponse updateGrade(
             @PathVariable Long id,
-            @RequestBody GradeRequest request){
+            @Valid @RequestBody GradeRequest request){
 
         return gradeService.updateGrade(id, request);
     }
