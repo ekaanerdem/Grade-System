@@ -39,6 +39,7 @@ public class GradeService{
 
             response.setId(grade.getId());
             response.setScore(grade.getScore());
+            response.setVersion(grade.getVersion());
             response.setStudentId(grade.getStudent().getId());
             response.setCourseId(grade.getCourse().getId());
 
@@ -70,6 +71,7 @@ public class GradeService{
 
         response.setId(savedGrade.getId());
         response.setScore(savedGrade.getScore());
+        response.setVersion(savedGrade.getVersion());
         response.setStudentId(savedGrade.getStudent().getId());
         response.setCourseId(savedGrade.getCourse().getId());
 
@@ -85,6 +87,7 @@ public class GradeService{
 
         response.setId(grade.getId());
         response.setScore(grade.getScore());
+        response.setVersion(grade.getVersion());
         response.setStudentId(grade.getStudent().getId());
         response.setCourseId(grade.getCourse().getId());
 
@@ -114,6 +117,7 @@ public class GradeService{
 
         response.setId(updatedGrade.getId());
         response.setScore(updatedGrade.getScore());
+        response.setVersion(updatedGrade.getVersion());
         response.setStudentId(updatedGrade.getStudent().getId());
         response.setCourseId(updatedGrade.getCourse().getId());
 
@@ -133,6 +137,7 @@ public class GradeService{
 
             response.setId(grade.getId());
             response.setScore(grade.getScore());
+            response.setVersion(grade.getVersion());
             response.setStudentId(grade.getStudent().getId());
             response.setCourseId(grade.getCourse().getId());
 
@@ -155,6 +160,7 @@ public class GradeService{
 
             response.setId(grade.getId());
             response.setScore(grade.getScore());
+            response.setVersion(grade.getVersion());
             response.setStudentId(grade.getStudent().getId());
             response.setCourseId(grade.getCourse().getId());
 

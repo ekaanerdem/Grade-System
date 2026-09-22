@@ -6,58 +6,70 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Version;
 
 @Entity
 public class Grade{
 
-@Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-private Long id;
-private Double score;
+    private Long id;
+    private Double score;
 
-@ManyToOne
-@JoinColumn(name = "student_id")
-private Student student;
+    @Version
+    private Long version;
 
-@ManyToOne
-@JoinColumn(name = "course_id")
-private Course course;
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
 
-//Getter & Setter
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 
-public Long getId(){
-    return id;
-}
+    //Getter & Setter
 
-public void setId(Long id){
-    this.id = id;
-}
+    public Long getId(){
+        return id;
+    }
 
-public Double getScore(){
-    return score;
-}
+    public void setId(Long id){
+        this.id = id;
+    }
 
-public void setScore(Double score){
-    this.score = score;
-}
+    public Double getScore(){
+        return score;
+    }
 
-public Student getStudent(){
-    return student;
-}
+    public void setScore(Double score){
+        this.score = score;
+    }
 
-public void setStudent(Student student){
-    this.student = student;
-}
+    public Student getStudent(){
+        return student;
+    }
 
-public Course getCourse(){
-    return course;
-}
+    public void setStudent(Student student){
+        this.student = student;
+    }
 
-public void setCourse(Course course){
-    this.course = course;
-}
+    public Course getCourse(){
+        return course;
+    }
 
+    public void setCourse(Course course){
+        this.course = course;
+    }
+
+    public Long getVersion(){
+        return version;
+
+    }
+
+    public void setVersion(Long version){
+        this.version = version;
+    }
 
 
 }

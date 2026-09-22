@@ -6,6 +6,7 @@ public class GradeResponse {
     private Double score;
     private Long studentId;
     private Long courseId;
+    private Long version;
 
     public Long getId() {
         return id;
@@ -37,5 +38,13 @@ public class GradeResponse {
 
     public void setCourseId(Long courseId) {
         this.courseId = courseId;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }
