@@ -120,6 +120,50 @@ public class GradeService{
         return response;
     }
 
+    public List<GradeResponse> getGradesByStudentId(Long studentId) {
+
+        List<Grade> grades =
+                gradeRepository.findGradesByStudentIdNative(studentId);
+
+        List<GradeResponse> responses = new ArrayList<>();
+
+        for (Grade grade : grades) {
+
+            GradeResponse response = new GradeResponse();
+
+            response.setId(grade.getId());
+            response.setScore(grade.getScore());
+            response.setStudentId(grade.getStudent().getId());
+            response.setCourseId(grade.getCourse().getId());
+
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    public List<GradeResponse> getGradesByMinimumScore(Double score) {
+
+        List<Grade> grades =
+                gradeRepository.findGradesByMinimumScore(score);
+
+        List<GradeResponse> responses = new ArrayList<>();
+
+        for (Grade grade : grades) {
+
+            GradeResponse response = new GradeResponse();
+
+            response.setId(grade.getId());
+            response.setScore(grade.getScore());
+            response.setStudentId(grade.getStudent().getId());
+            response.setCourseId(grade.getCourse().getId());
+
+            responses.add(response);
+        }
+
+        return responses;
+    }   
+
     public void deleteGrade(Long id){
         gradeRepository.deleteById(id);
     }

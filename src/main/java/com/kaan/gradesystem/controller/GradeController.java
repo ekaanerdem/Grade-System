@@ -43,6 +43,20 @@ public class GradeController{
         return gradeService.getGradeById(id);
     }
 
+    @Operation(summary = "Öğrenci ID'sine göre notları getirir")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/grades/student/{studentId}")
+    public List<GradeResponse> getGradesByStudentId(@PathVariable Long studentId){
+        return gradeService.getGradesByStudentId(studentId);
+    }
+
+    @Operation(summary = "Minimum puana göre notları getirir")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/grades/min-score/{score}")
+    public List<GradeResponse> getGradesByMinimumScore(@PathVariable Double score){
+        return gradeService.getGradesByMinimumScore(score);
+    }
+
     @Operation(summary = "Not bilgisini günceller")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/grades/{id}")
