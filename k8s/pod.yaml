@@ -1,0 +1,27 @@
+apiVersion: v1                          # Kubernetes nesnesinin hangi API sürümünü kullandığını belirtir.
+kind: Pod                               # oluşturacağımız Kubernetes nesnesinin türü
+
+metadata:                               # Pod'u tanımlayan bilgileri içerir
+  name: grade-system-pod
+
+spec:                                   # Pod'un nasıl olmasını istediğimizi tarif ediyor
+  containers:
+    - name: grade-system-container
+      image: grade-system:latest
+
+      # Bu image'ı internetten/registry'den çekmeye çalışma,
+      # Minikube içerisinde bulunan local image'ı kullan.
+      imagePullPolicy: Never
+
+      ports:
+        - containerPort: 8080
+
+      env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://host.minikube.internal:5432/grade_system"
+
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: grade-system-secret
+              key: JWT_SECRET
