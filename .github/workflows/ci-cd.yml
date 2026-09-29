@@ -1,0 +1,65 @@
+name: Grade System CI/CD
+
+# main branch'e her push yapıldığında pipeline çalışır
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  # 1. STEP - BUILD
+  build:
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+      # GitHub'daki proje kodunu runner'a getirir
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Java projesini derler ve JAR dosyasını oluşturur
+      - name: Build project
+        run: ./mvnw clean package -DskipTests
+
+
+  # 2. STEP - TEST
+  test:
+    needs: build
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Unit testleri çalıştırır
+      - name: Run tests
+        run: ./mvnw test
+
+
+  # 3. STEP - DEPLOY
+  deploy:
+    needs: test
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Docker image oluşturur
+      - name: Build Docker image
+        run: |
+          ./mvnw clean package -DskipTests
+          docker build -t grade-system:latest .
+
+      # Oluşturulan image'ı Minikube'a yükler
+      - name: Load image to Minikube
+        run: minikube image load grade-system:latest
+
+      # Kubernetes YAML dosyalarını uygular
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl rollout restart deployment/grade-system-deployment
+          kubectl rollout status deployment/grade-system-deployment --timeout=120s
+          
