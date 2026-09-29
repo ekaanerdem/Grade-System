@@ -1,0 +1,38 @@
+apiVersion: apps/v1                    # Deployment için kullanılan Kubernetes API sürümü
+kind: Deployment                       # Oluşturacağımız Kubernetes nesnesinin türü
+
+metadata:                              # Deployment'ı tanımlayan bilgiler
+  name: grade-system-deployment
+
+spec:                                  # Deployment'ın nasıl çalışmasını istediğimizi tanımlar
+  replicas: 1                          # Aynı anda kaç Pod çalışacağını belirtir
+
+  selector:                            # Deployment'ın hangi Pod'ları yöneteceğini belirler
+    matchLabels:
+      app: grade-system
+
+  template:                            # Deployment'ın oluşturacağı Pod'ların şablonu
+    metadata:
+      labels:
+        app: grade-system              # Pod'a verilen etiket
+
+    spec:                              # Oluşturulacak Pod'un özellikleri
+      containers:
+        - name: grade-system-container
+          image: grade-system:latest
+
+          # Local olarak Minikube'a yüklediğimiz image'ı kullan
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8080
+
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://host.minikube.internal:5432/grade_system"
+
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: grade-system-secret
+                  key: JWT_SECRET
