@@ -2,6 +2,8 @@ package com.kaan.gradesystem.service;
 
 import com.kaan.gradesystem.entity.Course;
 import com.kaan.gradesystem.repository.CourseRepository;
+import com.kaan.gradesystem.dto.CourseRequest;
+import com.kaan.gradesystem.dto.CourseResponse;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,13 +43,15 @@ class CourseServiceTest{
 
         when(courseRepository.findAll()).thenReturn(courses);
 
-        List<Course> result = courseService.getAllCourses();
+        List<CourseResponse> result = courseService.getAllCourses();
 
         assertEquals(2, result.size());
-        assertEquals("Math", result.get(0).getName());
-        assertEquals("Biology", result.get(1).getName());
+        assertEquals("Math", result.get(0).name());
+        assertEquals("Biology", result.get(1).name());
 
         // ya da direkt assertEquals(courses, result);
+        // DTO kullandığımız için artık courses ve result farklı türlerde olduğu için
+        // bu yöntem kullanılmaz.
 
         verify(courseRepository).findAll();
     }
@@ -54,16 +59,22 @@ class CourseServiceTest{
     @Test
     void saveCourse_ShouldReturnSavedCourse() {
 
-        Course course = new Course();
-        course.setName("Java");
+        CourseRequest request = new CourseRequest(
+                "Java",
+                null,
+                null
+        );
 
-        when(courseRepository.save(course)).thenReturn(course);
+        Course savedCourse = new Course();
+        savedCourse.setName("Java");
 
-        Course result = courseService.saveCourse(course);
+        when(courseRepository.save(any(Course.class))).thenReturn(savedCourse);
 
-        assertEquals("Java", result.getName());
+        CourseResponse result = courseService.saveCourse(request);
 
-        verify(courseRepository).save(course);
+        assertEquals("Java", result.name());
+
+        verify(courseRepository).save(any(Course.class));
     }
 
     @Test
@@ -75,11 +86,11 @@ class CourseServiceTest{
         course.setName("Java");
 
         when(courseRepository.findById(id))
-                             .thenReturn(Optional.of(course));
+                .thenReturn(Optional.of(course));
 
-        Course result = courseService.getCourseById(id);
+        CourseResponse result = courseService.getCourseById(id);
 
-        assertEquals("Java", result.getName());
+        assertEquals("Java", result.name());
 
         verify(courseRepository).findById(id);
     }
@@ -92,7 +103,7 @@ class CourseServiceTest{
         when(courseRepository.findById(id))
                 .thenReturn(Optional.empty());
 
-        Course result = courseService.getCourseById(id);
+        CourseResponse result = courseService.getCourseById(id);
 
         assertNull(result);
 
@@ -109,10 +120,11 @@ class CourseServiceTest{
         existingCourse.setCode("OLD101");
         existingCourse.setTeacherName("Old Teacher");
 
-        Course newCourse = new Course();
-        newCourse.setName("Java");
-        newCourse.setCode("JAVA101");
-        newCourse.setTeacherName("New Teacher");
+        CourseRequest newCourse = new CourseRequest(
+                "Java",
+                "JAVA101",
+                "New Teacher"
+        );
 
         when(courseRepository.findById(id))
                 .thenReturn(Optional.of(existingCourse));
@@ -120,11 +132,11 @@ class CourseServiceTest{
         when(courseRepository.save(existingCourse))
                 .thenReturn(existingCourse);
 
-        Course result = courseService.updateCourse(id, newCourse);
+        CourseResponse result = courseService.updateCourse(id, newCourse);
 
-        assertEquals("Java", result.getName());
-        assertEquals("JAVA101", result.getCode());
-        assertEquals("New Teacher", result.getTeacherName());
+        assertEquals("Java", result.name());
+        assertEquals("JAVA101", result.code());
+        assertEquals("New Teacher", result.teacherName());
 
         verify(courseRepository).findById(id);
         verify(courseRepository).save(existingCourse);
@@ -139,5 +151,4 @@ class CourseServiceTest{
 
         verify(courseRepository).deleteById(id);
     }
-
 }

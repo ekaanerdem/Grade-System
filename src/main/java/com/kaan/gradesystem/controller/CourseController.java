@@ -1,6 +1,7 @@
 package com.kaan.gradesystem.controller;
 
-import com.kaan.gradesystem.entity.Course;
+import com.kaan.gradesystem.dto.CourseRequest;
+import com.kaan.gradesystem.dto.CourseResponse;
 import com.kaan.gradesystem.service.CourseService;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,30 +25,33 @@ public class CourseController{
     @Operation(summary = "Tüm dersleri listeler")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/courses")
-    public List<Course> getAllCourses(){
+    public List<CourseResponse> getAllCourses(){
         return courseService.getAllCourses();
     }
 
     @Operation(summary = "Yeni ders oluşturur")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("/courses")
-    public Course saveCourse(@RequestBody Course course){
-        return courseService.saveCourse(course);
+    public CourseResponse saveCourse(@RequestBody CourseRequest request){
+        return courseService.saveCourse(request);
     }
 
     @Operation(summary = "ID'ye göre ders getirir")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/courses/{id}")
-    public Course getCourseById(@PathVariable Long id){
+    public CourseResponse getCourseById(@PathVariable Long id){
         return courseService.getCourseById(id);
-        }
+    }
 
     @Operation(summary = "Ders bilgilerini günceller")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PutMapping("/courses/{id}")
-    public Course updateCourse(@PathVariable Long id, @RequestBody Course course){
-        return courseService.updateCourse(id, course);
-        }
+    public CourseResponse updateCourse(
+            @PathVariable Long id,
+            @RequestBody CourseRequest request){
+
+        return courseService.updateCourse(id, request);
+    }
 
     @Operation(summary = "Dersi siler")
     @PreAuthorize("hasAnyRole('ADMIN')")
