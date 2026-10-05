@@ -70,8 +70,8 @@ select
 	course.name as "Course Name",
 	grade.score as "Score"
 from grade
-inner join student on grade.student_id = grade.student.id
-inner join course on grade.course_id = grade.course.id;
+inner join student on grade.student_id = student.id
+inner join course on grade.course_id = course.id;
 
 -- NOTU OLMAYAN ÖĞRENCİ EKLEME (LEFT OUTER JOIN TESTİ İÇİN)
 insert into student (name,surname,email,password)
@@ -91,7 +91,7 @@ select
 	student.name as "Student Name",
 	avg(grade.score) as "Average Score"
 from student
-inner join grade on student.id = student_id
+inner join grade on student.id = grade.student_id
 group by student.id, student.name;
 
 -- GROUP BY: DERSLERİN NOT ORTALAMALARINI HESAPLAMA
@@ -99,7 +99,7 @@ select
 	course.name as "Course Name",
 	avg(grade.score) as "Average Score"
 from course
-inner join grade on course.id = course_id
+inner join grade on course.id = grade.course_id
 group by course.id, course.name;
 
 -- HAVING: ORTALAMASI 78'DEN YÜKSEK DERSLERİ LİSTELEME
@@ -115,6 +115,14 @@ having AVG(grade.score)>78;
 select name as "People"
 from student
 union 
+select teacher_name as "People"
+from course;
+
+-- UNION ALL: ÖĞRENCİ VE ÖĞRETMEN İSİMLERİNİ TEK LİSTEDE BİRLEŞTİRME
+-- AYNI DEĞERLER VARSA TEKRAR EDENLERİ DE GÖSTERİR
+select name as "People"
+from student
+union all
 select teacher_name as "People"
 from course;
 
