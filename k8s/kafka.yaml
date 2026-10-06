@@ -1,0 +1,13 @@
+# Kafka'ya Kubernetes içerisinden erişmek için Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+  namespace: grade-system
+spec:
+  selector:
+    app: kafka
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: 9092
