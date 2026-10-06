@@ -73,6 +73,14 @@ spec:
                 secretKeyRef:
                   name: grade-system-db-secret
                   key: JWT_SECRET
+            
+            # Valkey Kubernetes Service üzerinden erişilir.
+            - name: VALKEY_HOST
+              value: "valkey-service"
+
+            # Valkey'in varsayılan portu.
+            - name: VALKEY_PORT
+              value: "6379"
 
           ports:
             - name: http
