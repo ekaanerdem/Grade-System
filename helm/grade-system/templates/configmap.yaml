@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grade-system-config
+data:
+  # Spring Boot PostgreSQL'e localhost ile değil,
+  # Kubernetes'teki PostgreSQL Service üzerinden bağlanacak.
+  DB_URL: "jdbc:postgresql://postgres-service:5432/grade_system"
