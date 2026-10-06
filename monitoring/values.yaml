@@ -1,0 +1,9 @@
+# Prometheus metriclerini 2 saat saklar.
+prometheus:
+  prometheusSpec:
+    retention: 2h
+
+# Lokal Minikube ortamında Grafana için kalıcı disk kullanılmıyor.
+grafana:
+  persistence:
+    enabled: false
