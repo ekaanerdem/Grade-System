@@ -34,6 +34,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
+      volumes:
+        # CA sertifikasını ConfigMap'ten alır.
+        - name: elasticsearch-ca
+          configMap:
+            name: elasticsearch-ca
+
       containers:
         - name: {{ .Chart.Name }}
 
@@ -82,6 +88,35 @@ spec:
             - name: VALKEY_PORT
               value: "6379"
 
+            # Kubernetes içerisindeki Elasticsearch Service adresi.
+            - name: ELASTICSEARCH_URL
+              value: "https://elasticsearch-service:9200"
+
+            # Elasticsearch kullanıcı adı.
+            - name: ELASTICSEARCH_USERNAME
+              value: "elastic"
+
+            # Elasticsearch şifresi Kubernetes Secret'tan okunur.
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTIC_PASSWORD
+
+            # Elasticsearch CA sertifikasının container içindeki yolu.
+            - name: SPRING_SSL_BUNDLE_PEM_ELASTICSEARCH_TRUSTSTORE_CERTIFICATE
+              value: "file:/app/certs/http_ca.crt"
+
+            # Elasticsearch bağlantısında yukarıdaki SSL bundle kullanılır.
+            - name: SPRING_ELASTICSEARCH_RESTCLIENT_SSL_BUNDLE
+              value: "elasticsearch"
+
+          volumeMounts:
+            # Elasticsearch CA sertifikasını container içine bağlar.
+            - name: elasticsearch-ca
+              mountPath: /app/certs
+              readOnly: true
+
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -102,15 +137,19 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
 
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+          # Helm chart'ın varsayılan volumeMounts alanı.
+          # Elasticsearch volumeMounts yukarıda tanımlandığı için şu an kullanılmıyor.
+          # {{- with .Values.volumeMounts }}
+          # volumeMounts:
+          #   {{- toYaml . | nindent 12 }}
+          # {{- end }}
 
-      {{- with .Values.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      # Helm chart'ın varsayılan volumes alanı.
+      # Elasticsearch volume yukarıda tanımlandığı için şu an kullanılmıyor.
+      # {{- with .Values.volumes }}
+      # volumes:
+      #   {{- toYaml . | nindent 8 }}
+      # {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

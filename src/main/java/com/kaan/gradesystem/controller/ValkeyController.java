@@ -18,7 +18,7 @@ public class ValkeyController {
     public String setValue(@RequestParam String key,
                            @RequestParam String value) {
 
-        redisTemplate.opsForValue().set(key, value);
+        redisTemplate.opsForValue().set(key, value); //Terminaldeki SET student:1 Kaan
 
         return "Kaydedildi";
     }
@@ -27,14 +27,14 @@ public class ValkeyController {
     @GetMapping("/{key}")
     public String getValue(@PathVariable String key) {
 
-        return redisTemplate.opsForValue().get(key);
+        return redisTemplate.opsForValue().get(key); //Terminaldeki GET student:1
     }
 
     // Verilen key'i Valkey'den siler.
     @DeleteMapping("/{key}")
     public String deleteValue(@PathVariable String key) {
 
-        redisTemplate.delete(key);
+        redisTemplate.delete(key); //Terminaldeki DEL student:1
 
         return "Silindi";
     }
