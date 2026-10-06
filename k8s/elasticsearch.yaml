@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:9.1.4
+          ports:
+            - containerPort: 9200
+
+          env:
+            # Tek Elasticsearch node'u ile çalışacağımız için cluster discovery gerekmiyor.
+            - name: discovery.type
+              value: "single-node"
+
+            # Elasticsearch kullanıcısının şifresi Kubernetes Secret'tan okunur.
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTIC_PASSWORD
+
+            # Minikube'un belleğini fazla tüketmemesi için Java heap sınırı.
+            - name: ES_JAVA_OPTS
+              value: "-Xms512m -Xmx512m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-service
+spec:
+  type: ClusterIP
+  selector:
+    app: elasticsearch
+  ports:
+    - port: 9200
+      targetPort: 9200
