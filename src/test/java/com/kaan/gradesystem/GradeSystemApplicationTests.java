@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.kaan.gradesystem.kafka.StudentKafkaProducer;
+
 @SpringBootTest
 class GradeSystemApplicationTests {
 
@@ -13,6 +15,10 @@ class GradeSystemApplicationTests {
     @MockitoBean
 	//Bu test sırasında gerçek StudentElasticsearchRepository oluşturma. Onun yerine sahte/mock bir tane koy.
     private StudentElasticsearchRepository studentElasticsearchRepository;
+
+    // Context testi sırasında gerçek Kafka bağlantısı kullanılmasın.
+    @MockitoBean
+    private StudentKafkaProducer studentKafkaProducer;
 
     @Test
     void contextLoads() {

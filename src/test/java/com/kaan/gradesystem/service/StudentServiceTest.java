@@ -24,12 +24,18 @@ import static org.mockito.Mockito.verify;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.kaan.gradesystem.kafka.StudentKafkaProducer;
+
 @ExtendWith(MockitoExtension.class) //JUnit'a “Bu testte Mockito kullanacağım” diyoruz
 class StudentServiceTest {
 
     //Gerçek repository yerine sahte StudentRepository oluşturuyor.
     @Mock
     private StudentRepository studentRepository; 
+
+    // Kafka'ya gerçekten mesaj göndermeden Producer'ın sahtesini oluşturuyor.
+    @Mock
+    private StudentKafkaProducer studentKafkaProducer;
 
     //Gerçek StudentService oluşturuyor ve yukarıdaki sahte studentRepository'yi bunun içine veriyor.
     //@InjectMocks = “Mock olarak oluşturduğum bağımlılıkları StudentService'in içine inject et.”
@@ -156,8 +162,17 @@ class StudentServiceTest {
 
         Long id = 1L;
 
+        Student student = new Student();
+        student.setId(id);
+        student.setName("Kaan");
+
+        // Öğrenci veritabanında varmış gibi davran.
+        when(studentRepository.findById(id))
+                .thenReturn(Optional.of(student));
+
         studentService.deleteStudent(id);
 
+        verify(studentRepository).findById(id);
         verify(studentRepository).deleteById(id);
     }
 }

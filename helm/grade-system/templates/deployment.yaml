@@ -111,6 +111,10 @@ spec:
             - name: SPRING_ELASTICSEARCH_RESTCLIENT_SSL_BUNDLE
               value: "elasticsearch"
 
+            # Spring Boot, Kubernetes içerisindeki Kafka Service'e bağlanır.
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+
           volumeMounts:
             # Elasticsearch CA sertifikasını container içine bağlar.
             - name: elasticsearch-ca

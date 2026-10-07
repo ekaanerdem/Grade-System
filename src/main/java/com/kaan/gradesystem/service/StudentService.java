@@ -6,6 +6,9 @@ import com.kaan.gradesystem.entity.Student;
 import com.kaan.gradesystem.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 
+import com.kaan.gradesystem.kafka.StudentKafkaEvent;
+import com.kaan.gradesystem.kafka.StudentKafkaProducer;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,9 +16,12 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final StudentKafkaProducer studentKafkaProducer;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(StudentRepository studentRepository,
+                        StudentKafkaProducer studentKafkaProducer) {
         this.studentRepository = studentRepository;
+        this.studentKafkaProducer = studentKafkaProducer;
     }
 
 
@@ -50,6 +56,15 @@ public class StudentService {
         student.setPassword(request.getPassword());
 
         Student savedStudent = studentRepository.save(student);
+
+        // Öğrenci oluşturulduğunda Kafka'ya CREATE eventi gönder.
+        studentKafkaProducer.sendEvent(
+                new StudentKafkaEvent(
+                        "CREATE",
+                        savedStudent.getId(),
+                        savedStudent.getName()
+                )
+        );
 
         StudentResponse response = new StudentResponse();
 
@@ -96,6 +111,15 @@ public class StudentService {
 
         Student updatedStudent = studentRepository.save(existingStudent);
 
+        // Öğrenci güncellendiğinde Kafka'ya UPDATE eventi gönder.
+        studentKafkaProducer.sendEvent(
+                new StudentKafkaEvent(
+                        "UPDATE",
+                        updatedStudent.getId(),
+                        updatedStudent.getName()
+                )
+        );
+
         StudentResponse response = new StudentResponse();
 
         response.setId(updatedStudent.getId());
@@ -108,6 +132,22 @@ public class StudentService {
 
 
     public void deleteStudent(Long id) {
+
+        Student student = studentRepository.findById(id).orElse(null);
+    
+        if (student == null) {
+            return;
+        }
+    
         studentRepository.deleteById(id);
+    
+        // Öğrenci silindiğinde Kafka'ya DELETE eventi gönder.
+        studentKafkaProducer.sendEvent(
+                new StudentKafkaEvent(
+                        "DELETE",
+                        student.getId(),
+                        student.getName()
+                )
+        );
     }
 }
