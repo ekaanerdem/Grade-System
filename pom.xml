@@ -133,6 +133,19 @@
     <artifactId>spring-boot-starter-kafka</artifactId>
 </dependency>
 
+<!-- Circuit Breaker kullanmak için -->
+<dependency>
+    <groupId>io.github.resilience4j</groupId>
+    <artifactId>resilience4j-spring-boot4</artifactId>
+    <version>2.4.0</version>
+</dependency>
+
+<!-- @CircuitBreaker annotation'ının çalışması için AOP desteği -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-aspectj</artifactId>
+</dependency>
+
 	</dependencies>
 
 	<build>
@@ -144,34 +157,4 @@
         </plugin>
 
         <!-- Unit testlerin ne kadar kodu çalıştırdığını ölçmek için JaCoCo -->
-        <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.14</version>
-
-            <executions>
-
-                <!-- Testler başlamadan önce JaCoCo'yu aktif eder -->
-                <execution>
-                    <goals>
-                        <goal>prepare-agent</goal>
-                    </goals>
-                </execution>
-
-                <!-- Testlerden sonra coverage raporu oluşturur -->
-                <execution>
-                    <id>report</id>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>report</goal>
-                    </goals>
-                </execution>
-			
-
-            </executions>
-        </plugin>
-
-    </plugins>
-</build>
-
-</project>
+      
